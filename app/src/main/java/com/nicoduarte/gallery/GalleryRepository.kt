@@ -2,8 +2,7 @@ package com.nicoduarte.gallery
 
 import android.app.Application
 import com.nicoduarte.gallery.api.ApiService
-import com.nicoduarte.gallery.database.Album
-import io.reactivex.Observable
+import com.nicoduarte.gallery.database.model.Album
 import io.reactivex.Single
 
 class GalleryRepository(application: Application) {

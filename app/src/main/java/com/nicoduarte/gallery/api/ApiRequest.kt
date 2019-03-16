@@ -1,6 +1,6 @@
 package com.nicoduarte.gallery.api
 
-import com.nicoduarte.gallery.database.Album
+import com.nicoduarte.gallery.database.model.Album
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -11,8 +11,15 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ui.album.AlbumActivity"
-                  android:screenOrientation="portrait">
+        <activity
+                android:name=".ui.photo.PhotoActivity"
+                android:parentActivityName=".ui.album.AlbumActivity"
+                android:label="@string/title_photos"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
+                android:name=".ui.album.AlbumActivity"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>

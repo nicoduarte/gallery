@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.album.AlbumActivity">
+        tools:context=".ui.photo.PhotoActivity">
 
     <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -20,20 +20,20 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvAlbumList"
+            android:id="@+id/rvPhotoList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:scrollbars="vertical"
             android:padding="@dimen/item_offset"
             tools:itemCount="10"
-            tools:listitem="@layout/item_album"
+            tools:listitem="@layout/item_photo"
             tools:spanCount="2"
             tools:layoutManager="android.support.v7.widget.GridLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <ProgressBar
-            android:id="@+id/pbAlbum"
+            android:id="@+id/pbPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminateTint="@color/colorPrimary"

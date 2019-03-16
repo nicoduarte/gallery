@@ -4,11 +4,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.nicoduarte.gallery.R
-import com.nicoduarte.gallery.database.Album
+import com.nicoduarte.gallery.database.model.Album
 import com.nicoduarte.gallery.inflate
 import kotlinx.android.synthetic.main.item_album.view.*
 
-class AlbumAdapter(var items: MutableList<Album>): RecyclerView.Adapter<RecyclerView.ViewHolder>()  {
+class AlbumAdapter(var items: MutableList<Album>, val clickListener: (Int) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>()  {
 
     companion object {
         const val SPAN_COUNT: Int = 2
@@ -22,16 +22,17 @@ class AlbumAdapter(var items: MutableList<Album>): RecyclerView.Adapter<Recycler
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as AlbumHolder).bind(items[position])
+        (holder as AlbumHolder).bind(items[position], clickListener)
     }
 
     inner class AlbumHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(album: Album) = with(itemView) {
+        fun bind(album: Album, clickListener: (Int) -> Unit) = with(itemView) {
             tvTitle.text = album.title
 //            GlideApp.with(context)
 //                .load("")
 //                .placeholder(R.drawable.album_placeholder)
 //                .into(ivAlbum)
+            setOnClickListener { clickListener(album.id) }
         }
     }
 

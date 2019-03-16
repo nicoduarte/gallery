@@ -1,4 +1,4 @@
-package com.nicoduarte.gallery.database
+package com.nicoduarte.gallery.database.model
 
 data class Album(
     val userId: Int,

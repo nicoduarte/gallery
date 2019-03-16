@@ -6,7 +6,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.nicoduarte.gallery.GalleryRepository
 import com.nicoduarte.gallery.api.ApiErrorParser
-import com.nicoduarte.gallery.database.Album
+import com.nicoduarte.gallery.database.model.Album
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers

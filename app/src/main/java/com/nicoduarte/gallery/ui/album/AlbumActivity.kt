@@ -1,6 +1,7 @@
 package com.nicoduarte.gallery.ui.album
 
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
@@ -8,9 +9,9 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
 import com.nicoduarte.gallery.R
-import com.nicoduarte.gallery.database.Album
 import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
+import com.nicoduarte.gallery.ui.photo.PhotoActivity
 import com.nicoduarte.gallery.utils.EndlessRecyclerViewScrollListener
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
@@ -57,13 +58,19 @@ class AlbumActivity : BaseActivity() {
     private fun showMoviesList(state: AlbumState) {
         if (state.albums != null) {
             if (rvAlbumList.adapter == null) {
-                val adapter = AlbumAdapter(state.albums.toMutableList())
+                val adapter = AlbumAdapter(state.albums.toMutableList()) { id: Int -> launchPhotoActivity(id) }
                 rvAlbumList.adapter = adapter
             } else {
                 val adapter = rvAlbumList.adapter as? AlbumAdapter
                 adapter?.addAlbums(state.albums)
             }
         }
+    }
+
+    private fun launchPhotoActivity(id: Int) {
+        val intent = Intent(this, PhotoActivity::class.java)
+        intent.putExtra(PhotoActivity.EXTRA_ID, id)
+        startActivity(intent)
     }
 
     private fun checkError(state: AlbumState) {

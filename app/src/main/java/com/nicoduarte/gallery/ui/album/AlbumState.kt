@@ -1,6 +1,6 @@
 package com.nicoduarte.gallery.ui.album
 
-import com.nicoduarte.gallery.database.Album
+import com.nicoduarte.gallery.database.model.Album
 
 data class AlbumState(
     val loading: Boolean = true,
