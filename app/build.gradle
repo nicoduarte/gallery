@@ -41,4 +41,17 @@ dependencies {
 
     // Design
     implementation "com.android.support:design:$androidVersion"
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+    // RxJava
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
 }

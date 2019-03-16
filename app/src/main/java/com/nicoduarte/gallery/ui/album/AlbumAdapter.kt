@@ -10,6 +10,10 @@ import kotlinx.android.synthetic.main.item_album.view.*
 
 class AlbumAdapter(var items: MutableList<Album>): RecyclerView.Adapter<RecyclerView.ViewHolder>()  {
 
+    companion object {
+        const val SPAN_COUNT: Int = 2
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerView.ViewHolder {
         return AlbumHolder(parent.inflate(R.layout.item_album))
     }
@@ -29,5 +33,11 @@ class AlbumAdapter(var items: MutableList<Album>): RecyclerView.Adapter<Recycler
 //                .placeholder(R.drawable.album_placeholder)
 //                .into(ivAlbum)
         }
+    }
+
+    fun addAlbums(movies: List<Album>) {
+        val positionStart = items.size
+        items.addAll(movies)
+        notifyItemRangeInserted(positionStart, items.size)
     }
 }

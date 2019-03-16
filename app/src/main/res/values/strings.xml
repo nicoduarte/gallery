@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Gallery</string>
+    <string name="timeout">Timeout</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

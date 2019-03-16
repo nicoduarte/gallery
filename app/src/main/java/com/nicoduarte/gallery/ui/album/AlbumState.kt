@@ -1,4 +1,9 @@
 package com.nicoduarte.gallery.ui.album
 
-class AlbumState {
-}
+import com.nicoduarte.gallery.database.Album
+
+data class AlbumState(
+    val loading: Boolean = true,
+    val albums: List<Album>? = null,
+    val error: String? = null
+)

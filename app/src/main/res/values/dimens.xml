@@ -4,6 +4,7 @@
     <dimen name="text_size_18sp">18sp</dimen>
 
     <dimen name="app_bar_height">250dp</dimen>
+    <dimen name="item_offset">5dp</dimen>
     <dimen name="margin_10dp">10dp</dimen>
     <dimen name="image_height">200dp</dimen>
     <dimen name="poster_width">80dp</dimen>
