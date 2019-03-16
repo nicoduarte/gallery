@@ -4,12 +4,14 @@ import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.Album
 import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
+import com.nicoduarte.gallery.utils.EndlessRecyclerViewScrollListener
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
 import kotlinx.android.synthetic.main.activity_album.*
@@ -37,6 +39,13 @@ class AlbumActivity : BaseActivity() {
         val layoutManager = GridLayoutManager(this, AlbumAdapter.SPAN_COUNT)
         rvAlbumList.layoutManager = layoutManager
         rvAlbumList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
+        rvAlbumList.addOnScrollListener(
+            object : EndlessRecyclerViewScrollListener(rvAlbumList.layoutManager as GridLayoutManager) {
+
+                override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                    viewModel.getAlbums(page)
+                }
+            })
     }
 
     private fun update(state: AlbumState) {
