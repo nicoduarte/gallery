@@ -3,6 +3,7 @@ package com.nicoduarte.gallery.ui.photo
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import com.nicoduarte.gallery.GlideApp
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.inflate
@@ -28,10 +29,10 @@ class PhotoAdapter(var items: MutableList<Photo>): RecyclerView.Adapter<Recycler
     inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(photo: Photo) = with(itemView) {
             tvTitle.text = photo.title
-//            GlideApp.with(context)
-//                .load("")
-//                .placeholder(R.drawable.album_placeholder)
-//                .into(ivAlbum)
+            GlideApp.with(context)
+                .load(photo.thumbnailUrl)
+                .placeholder(R.drawable.album_placeholder)
+                .into(ivPhoto)
         }
     }
 }

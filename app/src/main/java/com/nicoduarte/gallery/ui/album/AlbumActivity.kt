@@ -52,10 +52,10 @@ class AlbumActivity : BaseActivity() {
     private fun update(state: AlbumState) {
         updateProgressBar(state)
         checkError(state)
-        showMoviesList(state)
+        showAlbumList(state)
     }
 
-    private fun showMoviesList(state: AlbumState) {
+    private fun showAlbumList(state: AlbumState) {
         if (state.albums != null) {
             if (rvAlbumList.adapter == null) {
                 val adapter = AlbumAdapter(state.albums.toMutableList()) { id: Int -> launchPhotoActivity(id) }

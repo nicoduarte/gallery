@@ -1,20 +1,25 @@
 package com.nicoduarte.gallery.ui.photo
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
+import android.view.View
 import com.nicoduarte.gallery.R
-import com.nicoduarte.gallery.database.model.Photo
+import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
+import com.nicoduarte.gallery.visible
 import kotlinx.android.synthetic.main.activity_photo.*
-import java.util.ArrayList
 
 class PhotoActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_ID: String = "EXTRA_ID"
     }
+
+    private lateinit var viewModel: PhotoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,27 +28,46 @@ class PhotoActivity : BaseActivity() {
         toolbarToLoad(toolbarView as Toolbar)
         enableHomeDisplay(true)
         setUpRecyclerView()
+        setUpViewModel()
+    }
+
+    private fun setUpViewModel() {
+        val albumId = intent?.extras?.get(EXTRA_ID) as Int
+        viewModel = ViewModelFactory(application, albumId).create(PhotoViewModel::class.java)
+        viewModel.getPhotoState().observe(this, Observer { it?.let {update(it)} })
+        viewModel.getPhotos()
     }
 
     private fun setUpRecyclerView() {
         val layoutManager = GridLayoutManager(this, PhotoAdapter.SPAN_COUNT)
         rvPhotoList.layoutManager = layoutManager
-        rvPhotoList.adapter = PhotoAdapter(getPhotos())
         rvPhotoList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
     }
 
-    private fun getPhotos(): MutableList<Photo> {
-        val photos = ArrayList<Photo>()
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        photos.add(Photo(1,2,"","",""))
-        return photos
+    private fun update(state: PhotoState) {
+        updateProgressBar(state)
+        checkError(state)
+        showPhotoList(state)
+    }
+
+    private fun showPhotoList(state: PhotoState) {
+        if (state.photos != null) {
+            if (rvPhotoList.adapter == null) {
+                val adapter = PhotoAdapter(state.photos.toMutableList())
+                rvPhotoList.adapter = adapter
+            }
+        }
+    }
+
+    private fun checkError(state: PhotoState) {
+        val parentLayout = findViewById<View>(android.R.id.content)
+        state.error?.let { Snackbar.make(parentLayout, state.error, Snackbar.LENGTH_SHORT).show()  }
+    }
+
+    private fun updateProgressBar(state: PhotoState) {
+        when {
+            state.loading -> pbPhoto.visible()
+            else -> pbPhoto.gone()
+        }
     }
 }
