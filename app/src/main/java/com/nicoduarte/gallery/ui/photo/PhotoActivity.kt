@@ -1,14 +1,17 @@
 package com.nicoduarte.gallery.ui.photo
 
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.View
 import com.nicoduarte.gallery.R
+import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
+import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
 import kotlinx.android.synthetic.main.activity_photo.*
@@ -53,10 +56,19 @@ class PhotoActivity : BaseActivity() {
     private fun showPhotoList(state: PhotoState) {
         if (state.photos != null) {
             if (rvPhotoList.adapter == null) {
-                val adapter = PhotoAdapter(state.photos.toMutableList())
+                val adapter = PhotoAdapter(state.photos.toMutableList()) { position -> launchActivity(position,
+                    state.photos.toMutableList() as ArrayList<Photo>
+                )}
                 rvPhotoList.adapter = adapter
             }
         }
+    }
+
+    private fun launchActivity(position: Int, photos: ArrayList<Photo>) {
+        val intent = Intent(this, PhotoDetailActivity::class.java)
+        intent.putExtra(PhotoDetailActivity.EXTRA_POSITION, position)
+        intent.putParcelableArrayListExtra(PhotoDetailActivity.EXTRA_PHOTO_LIST, photos)
+        startActivity(intent)
     }
 
     private fun checkError(state: PhotoState) {
