@@ -5,6 +5,7 @@ import android.support.v7.widget.Toolbar
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.ui.BaseActivity
+import com.nicoduarte.gallery.utils.DepthTransformation
 import kotlinx.android.synthetic.main.activity_photo_detail.*
 
 class PhotoDetailActivity : BaseActivity() {
@@ -18,6 +19,7 @@ class PhotoDetailActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_detail)
 
+        toolbarView.setBackgroundColor(resources.getColor(R.color.transparent_black, theme))
         toolbarToLoad(toolbarView as Toolbar)
         enableHomeDisplay(true)
         setUpViewPager()
@@ -26,5 +28,6 @@ class PhotoDetailActivity : BaseActivity() {
     private fun setUpViewPager() {
         val photos = intent?.extras?.getParcelableArrayList<Photo>(EXTRA_PHOTO_LIST)
         vpPhotos.adapter = PhotoPagerAdapter(photos!!)
+        vpPhotos.setPageTransformer(true, DepthTransformation())
     }
 }

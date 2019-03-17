@@ -9,7 +9,7 @@ import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.inflate
 import kotlinx.android.synthetic.main.item_photo.view.*
 
-class PhotoAdapter(var items: MutableList<Photo>, val clickListener: (position: Int) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotoAdapter(var items: MutableList<Photo>, val clickListener: (position: Int, items: List<Photo>) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val SPAN_COUNT: Int = 2
@@ -29,14 +29,20 @@ class PhotoAdapter(var items: MutableList<Photo>, val clickListener: (position: 
     inner class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(
             photo: Photo,
-            clickListener: (position: Int) -> Unit
+            clickListener: (position: Int, items: List<Photo>) -> Unit
         ) = with(itemView) {
             tvTitle.text = photo.title
             GlideApp.with(context)
                 .load(photo.thumbnailUrl)
                 .placeholder(R.drawable.album_placeholder)
                 .into(ivPhoto)
-            setOnClickListener { clickListener(adapterPosition) }
+            setOnClickListener { clickListener(adapterPosition, items.toList()) }
         }
+    }
+
+    fun addAlbums(movies: List<Photo>) {
+        val positionStart = items.size
+        items.addAll(movies)
+        notifyItemRangeInserted(positionStart, items.size)
     }
 }

@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.gone
@@ -14,12 +16,16 @@ import com.nicoduarte.gallery.ui.BaseActivity
 import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.activity_photo.*
 
 class PhotoActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_ID: String = "EXTRA_ID"
+        const val DURATION: Long = 500
     }
 
     private lateinit var viewModel: PhotoViewModel
@@ -44,6 +50,12 @@ class PhotoActivity : BaseActivity() {
     private fun setUpRecyclerView() {
         val layoutManager = GridLayoutManager(this, PhotoAdapter.SPAN_COUNT)
         rvPhotoList.layoutManager = layoutManager
+        val adapter = PhotoAdapter(emptyList<Photo>().toMutableList()) { position: Int, photos: List<Photo> -> launchActivity(position,
+            photos as ArrayList<Photo>
+        )}
+        rvPhotoList.itemAnimator = SlideInUpAnimator(AccelerateDecelerateInterpolator())
+        rvPhotoList.itemAnimator!!.addDuration = DURATION
+        rvPhotoList.adapter = adapter
         rvPhotoList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
     }
 
@@ -56,10 +68,13 @@ class PhotoActivity : BaseActivity() {
     private fun showPhotoList(state: PhotoState) {
         if (state.photos != null) {
             if (rvPhotoList.adapter == null) {
-                val adapter = PhotoAdapter(state.photos.toMutableList()) { position -> launchActivity(position,
-                    state.photos.toMutableList() as ArrayList<Photo>
+                val adapter = PhotoAdapter(state.photos.toMutableList()) { position: Int, photos: List<Photo> -> launchActivity(position,
+                    photos as ArrayList<Photo>
                 )}
                 rvPhotoList.adapter = adapter
+            }  else {
+                val adapter = rvPhotoList.adapter as? PhotoAdapter
+                adapter?.addAlbums(state.photos)
             }
         }
     }

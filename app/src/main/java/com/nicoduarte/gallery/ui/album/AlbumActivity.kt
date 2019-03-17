@@ -8,16 +8,23 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.nicoduarte.gallery.R
+import com.nicoduarte.gallery.database.model.Album
 import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
 import com.nicoduarte.gallery.ui.photo.PhotoActivity
 import com.nicoduarte.gallery.utils.EndlessRecyclerViewScrollListener
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator
 import kotlinx.android.synthetic.main.activity_album.*
 
 class AlbumActivity : BaseActivity() {
+
+    companion object {
+        const val DURATION: Long = 500
+    }
 
     private lateinit var viewModel: AlbumViewModel
 
@@ -39,6 +46,10 @@ class AlbumActivity : BaseActivity() {
     private fun setUpRecyclerView() {
         val layoutManager = GridLayoutManager(this, AlbumAdapter.SPAN_COUNT)
         rvAlbumList.layoutManager = layoutManager
+        rvAlbumList.itemAnimator = ScaleInAnimator(AccelerateDecelerateInterpolator())
+        rvAlbumList.itemAnimator!!.addDuration = DURATION
+        val adapter = AlbumAdapter(emptyList<Album>().toMutableList()) { id: Int -> launchPhotoActivity(id) }
+        rvAlbumList.adapter = adapter
         rvAlbumList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
         rvAlbumList.addOnScrollListener(
             object : EndlessRecyclerViewScrollListener(rvAlbumList.layoutManager as GridLayoutManager) {

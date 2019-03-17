@@ -28,10 +28,6 @@ class AlbumAdapter(var items: MutableList<Album>, val clickListener: (Int) -> Un
     inner class AlbumHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(album: Album, clickListener: (Int) -> Unit) = with(itemView) {
             tvTitle.text = album.title
-//            GlideApp.with(context)
-//                .load("")
-//                .placeholder(R.drawable.album_placeholder)
-//                .into(ivAlbum)
             setOnClickListener { clickListener(album.id) }
         }
     }
