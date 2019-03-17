@@ -1,13 +1,23 @@
 package com.nicoduarte.gallery.database.model
 
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 
+@Entity(tableName = "photo_table")
 data class Photo(
+    @ColumnInfo(name = "albumId")
     val albumId: Int,
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     val id: Int,
+    @ColumnInfo(name = "title")
     val title: String,
+    @ColumnInfo(name = "url")
     val url: String,
+    @ColumnInfo(name = "thumbnailUrl")
     val thumbnailUrl: String
 ): Parcelable {
 
@@ -17,7 +27,7 @@ data class Photo(
         parcel.readString(),
         parcel.readString(),
         parcel.readString()
-    ) {}
+    )
 
     override fun writeToParcel(parcel: Parcel?, p1: Int) {
         parcel?.writeInt(albumId)
