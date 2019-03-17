@@ -19,7 +19,7 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        maven { url "https://jitpack.io" }
     }
 }
 
@@ -28,6 +28,8 @@ ext {
     lifecycleVersion = '1.1.1'
     androidVersion = '28.0.0'
     espressoVersion = '3.0.1'
+    glideVersion = '4.8.0'
+    retrofitVersion = '2.5.0'
 }
 
 task clean(type: Delete) {

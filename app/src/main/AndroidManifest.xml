@@ -13,6 +13,7 @@
             android:theme="@style/AppTheme">
         <activity
                 android:name=".ui.detail.PhotoDetailActivity"
+                android:theme="@style/Theme.Transparent"
                 android:screenOrientation="portrait">
         </activity>
         <activity

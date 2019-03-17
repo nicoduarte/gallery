@@ -21,8 +21,8 @@ class DepthTransformation: ViewPager.PageTransformer {
         } else if (position <= 1) {    // (0,1]
             page.translationX = -position * page.width
             page.alpha = 1 - Math.abs(position)
-            page.scaleX = 1 - Math.abs(position)
-            page.scaleY = 1 - Math.abs(position)
+            page.scaleX = 1 - Math.abs(position) *0.2f
+            page.scaleY = 1 - Math.abs(position) *0.2f
 
         } else {    // (1,+Infinity]
             // This page is way off-screen to the right.
