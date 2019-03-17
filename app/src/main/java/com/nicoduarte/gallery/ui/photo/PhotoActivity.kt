@@ -1,11 +1,11 @@
 package com.nicoduarte.gallery.ui.photo
 
+import android.app.ActivityOptions
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -16,10 +16,13 @@ import com.nicoduarte.gallery.ui.BaseActivity
 import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity
 import com.nicoduarte.gallery.utils.ItemOffsetDecoration
 import com.nicoduarte.gallery.visible
-import jp.wasabeef.recyclerview.animators.FadeInAnimator
-import jp.wasabeef.recyclerview.animators.ScaleInAnimator
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.activity_photo.*
+import android.app.Activity
+import android.support.v4.app.SharedElementCallback
+import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity.Companion.EXIT_POSITION
+import android.view.View.OnLayoutChangeListener
+
 
 class PhotoActivity : BaseActivity() {
 
@@ -29,6 +32,8 @@ class PhotoActivity : BaseActivity() {
     }
 
     private lateinit var viewModel: PhotoViewModel
+    private var enterPosition: Int = 0
+    private var exitPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,9 +55,10 @@ class PhotoActivity : BaseActivity() {
     private fun setUpRecyclerView() {
         val layoutManager = GridLayoutManager(this, PhotoAdapter.SPAN_COUNT)
         rvPhotoList.layoutManager = layoutManager
-        val adapter = PhotoAdapter(emptyList<Photo>().toMutableList()) { position: Int, photos: List<Photo> -> launchActivity(position,
-            photos as ArrayList<Photo>
-        )}
+        val adapter = PhotoAdapter(emptyList<Photo>().toMutableList()) {
+                position: Int, photos: List<Photo>, imageShared: View ->
+            launchActivity(position, photos as ArrayList<Photo>, imageShared)
+        }
         rvPhotoList.itemAnimator = SlideInUpAnimator(AccelerateDecelerateInterpolator())
         rvPhotoList.itemAnimator!!.addDuration = DURATION
         rvPhotoList.adapter = adapter
@@ -68,9 +74,10 @@ class PhotoActivity : BaseActivity() {
     private fun showPhotoList(state: PhotoState) {
         if (state.photos != null) {
             if (rvPhotoList.adapter == null) {
-                val adapter = PhotoAdapter(state.photos.toMutableList()) { position: Int, photos: List<Photo> -> launchActivity(position,
-                    photos as ArrayList<Photo>
-                )}
+                val adapter = PhotoAdapter(state.photos.toMutableList()) {
+                        position: Int, photos: List<Photo>, imageShared: View ->
+                    launchActivity(position, photos as ArrayList<Photo>, imageShared)
+                }
                 rvPhotoList.adapter = adapter
             }  else {
                 val adapter = rvPhotoList.adapter as? PhotoAdapter
@@ -79,11 +86,20 @@ class PhotoActivity : BaseActivity() {
         }
     }
 
-    private fun launchActivity(position: Int, photos: ArrayList<Photo>) {
+    private fun launchActivity(
+        position: Int,
+        photos: ArrayList<Photo>,
+        imageShared: View
+    ) {
         val intent = Intent(this, PhotoDetailActivity::class.java)
         intent.putExtra(PhotoDetailActivity.EXTRA_POSITION, position)
         intent.putParcelableArrayListExtra(PhotoDetailActivity.EXTRA_PHOTO_LIST, photos)
-        startActivity(intent)
+
+        val options = ActivityOptions.makeSceneTransitionAnimation(
+            this, imageShared, imageShared.transitionName
+        )
+        startActivityForResult(intent, 0, options.toBundle())
+        setCallback(position)
     }
 
     private fun checkError(state: PhotoState) {
@@ -96,5 +112,63 @@ class PhotoActivity : BaseActivity() {
             state.loading -> pbPhoto.visible()
             else -> pbPhoto.gone()
         }
+    }
+
+    override fun onActivityReenter(resultCode: Int, data: Intent?) {
+        super.onActivityReenter(resultCode, data)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            exitPosition = data.getIntExtra(EXIT_POSITION, enterPosition)
+            scrollToPosition()
+        }
+    }
+
+    private fun setCallback(enterPosition: Int) {
+        this.enterPosition = enterPosition
+        setExitSharedElementCallback(object : SharedElementCallback() {
+            override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) {
+
+                // Locate the ViewHolder for the clicked position.
+                val selectedViewHolder = rvPhotoList
+                    .findViewHolderForAdapterPosition(exitPosition)
+                if (selectedViewHolder?.itemView == null) {
+                    return
+                }
+
+                // Map the first shared element name to the child ImageView.
+                sharedElements[names[0]] = selectedViewHolder.itemView.findViewById(R.id.ivPhoto)
+                setExitSharedElementCallback(null as SharedElementCallback?)
+            }
+        })
+    }
+
+    /**
+     * Scrolls the recycler view to show the last viewed item in the grid. This is important when
+     * navigating back from the grid.
+     */
+    private fun scrollToPosition() {
+        rvPhotoList.addOnLayoutChangeListener(object : OnLayoutChangeListener {
+            override fun onLayoutChange(
+                v: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int
+            ) {
+                rvPhotoList.removeOnLayoutChangeListener(this)
+                val layoutManager = rvPhotoList.layoutManager
+                val viewAtPosition = layoutManager?.findViewByPosition(exitPosition)
+                // Scroll to position if the view for the current position is null (not currently part of
+                // layout manager children), or it's not completely visible.
+                if (viewAtPosition == null || layoutManager
+                        .isViewPartiallyVisible(viewAtPosition, false, true)
+                ) {
+                    rvPhotoList.post { layoutManager?.scrollToPosition(exitPosition) }
+                }
+            }
+        })
     }
 }
