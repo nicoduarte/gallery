@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.app.SharedElementCallback
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.view.View
 import com.github.chrisbanes.photoview.PhotoView
 import com.nicoduarte.gallery.R
@@ -37,6 +38,16 @@ class PhotoDetailActivity : BaseActivity() {
         toolbarToLoad(toolbarView as Toolbar)
         enableHomeDisplay(true)
         setUpViewPager()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setUpViewPager() {

@@ -57,6 +57,10 @@ class PhotoActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
             R.id.grid -> {
                 val gridLayout = rvPhotoList.layoutManager as GridLayoutManager
                 if(gridLayout.spanCount == TWO_COLUMNS) {
