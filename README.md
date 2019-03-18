@@ -1,8 +1,8 @@
 # Gallery App
-Application Android for visualizer albums and photos using data from JSONPlaceholder.
+This is an Android application to visualize albums and photos using data from JSONPlaceholder.
 
 ## Features
-This app contains 3 screen:
+This app contains three screens:
 * Image albums screen
 * Photos screen
 * Photo detail screen
