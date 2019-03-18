@@ -9,7 +9,7 @@ import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.inflate
 import kotlinx.android.synthetic.main.item_photo.view.*
 
-class PhotoAdapter(var items: MutableList<Photo>, val clickListener: (position: Int, items: List<Photo>, imageShared: View) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotoAdapter(var items: MutableList<Photo>, private val clickListener: (position: Int, items: List<Photo>, imageShared: View) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val SPAN_COUNT: Int = 2

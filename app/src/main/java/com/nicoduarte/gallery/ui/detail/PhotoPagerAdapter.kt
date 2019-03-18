@@ -20,7 +20,16 @@ import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
 
 
-class PhotoPagerAdapter(private val photoList: ArrayList<Photo>, val currentItem: Int, val dismissListener: () -> Unit) : PagerAdapter() {
+class PhotoPagerAdapter(
+    private val photoList: ArrayList<Photo>,
+    val currentItem: Int,
+    private val dismissListener: () -> Unit,
+    val positionChangeListener: (Float) -> Unit
+) : PagerAdapter() {
+
+    companion object {
+        private const val VISIBILITY = 1.0F
+    }
 
     override fun isViewFromObject(view: View, obj: Any): Boolean {
         return view === obj
@@ -38,14 +47,15 @@ class PhotoPagerAdapter(private val photoList: ArrayList<Photo>, val currentItem
 
         flingLayout.positionChangeListener = object : PositionChangeListener {
             override fun invoke(top: Int, left: Int, positionRangeRate: Float) {
-                flingLayout.setBackgroundColor(Color.argb(Math.round(255 * (1.0F - positionRangeRate)), 0, 0, 0))
-                title.alpha = 1.0F - positionRangeRate
+                flingLayout.setBackgroundColor(Color.argb(Math.round(255 * (VISIBILITY - positionRangeRate)), 0, 0, 0))
+                title.alpha = VISIBILITY - positionRangeRate
+                positionChangeListener(positionRangeRate)
             }
         }
 
         val ivPhoto = view.findViewById<PhotoView>(R.id.ivPhotoDetail)
-        ivPhoto.setOnScaleChangeListener { scaleFactor, focusX, focusY ->
-            flingLayout.isDragEnabled = (scaleFactor <= 1f)
+        ivPhoto.setOnScaleChangeListener { scaleFactor, _, _ ->
+            flingLayout.isDragEnabled = (scaleFactor <= VISIBILITY)
         }
 
         ivPhoto.transitionName = position.toString()

@@ -29,6 +29,8 @@ class AlbumViewModel(
     fun getAlbumState(): LiveData<AlbumState> = albumState
 
     fun getAlbums(page: Int = 1) {
+        albumState.value = currentViewState().copy(loading = true, albums = null, error = null)
+
         val disposable = repository.getAlbums(page)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

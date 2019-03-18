@@ -2,6 +2,8 @@ package com.nicoduarte.gallery.ui.detail
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.app.SharedElementCallback
 import android.support.v7.widget.Toolbar
@@ -40,9 +42,13 @@ class PhotoDetailActivity : BaseActivity() {
     private fun setUpViewPager() {
         val photos = intent?.extras?.getParcelableArrayList<Photo>(EXTRA_PHOTO_LIST)
         currentItem = intent?.getIntExtra(EXTRA_POSITION, 0)!!
-        vpPhotos.adapter = PhotoPagerAdapter(photos!!, currentItem) { finishAfterTransition() }
+        vpPhotos.adapter = PhotoPagerAdapter(photos!!, currentItem, { finishAfterTransition() }, this::changeBackgroundColor)
         vpPhotos.setPageTransformer(true, DepthTransformation())
         vpPhotos.currentItem = currentItem
+    }
+
+    private fun changeBackgroundColor(positionRangeRate: Float) {
+//        window.setBackgroundDrawable(ColorDrawable(Color.argb(Math.round(255 * (PhotoPagerAdapter.VISIBILITY - positionRangeRate)), 0, 0, 0)))
     }
 
     override fun finishAfterTransition() {

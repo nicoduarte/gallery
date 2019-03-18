@@ -20,6 +20,8 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.activity_photo.*
 import android.app.Activity
 import android.support.v4.app.SharedElementCallback
+import android.view.Menu
+import android.view.MenuItem
 import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity.Companion.EXIT_POSITION
 import android.view.View.OnLayoutChangeListener
 
@@ -29,6 +31,8 @@ class PhotoActivity : BaseActivity() {
     companion object {
         const val EXTRA_ID: String = "EXTRA_ID"
         const val DURATION: Long = 500
+        const val TWO_COLUMNS: Int = 2
+        const val FOUR_COLUMNS: Int = 4
     }
 
     private lateinit var viewModel: PhotoViewModel
@@ -45,6 +49,30 @@ class PhotoActivity : BaseActivity() {
         setUpViewModel()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.option_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.grid -> {
+                val gridLayout = rvPhotoList.layoutManager as GridLayoutManager
+                if(gridLayout.spanCount == TWO_COLUMNS) {
+                    gridLayout.spanCount = FOUR_COLUMNS
+                    item.setIcon(R.drawable.ic_two_columns)
+                } else {
+                    gridLayout.spanCount = TWO_COLUMNS
+                    item.setIcon(R.drawable.ic_four_columns)
+                }
+                rvPhotoList.layoutManager = gridLayout
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun setUpViewModel() {
         val albumId = intent?.extras?.get(EXTRA_ID) as Int
         viewModel = ViewModelFactory(application, albumId).create(PhotoViewModel::class.java)
@@ -53,7 +81,7 @@ class PhotoActivity : BaseActivity() {
     }
 
     private fun setUpRecyclerView() {
-        val layoutManager = GridLayoutManager(this, PhotoAdapter.SPAN_COUNT)
+        val layoutManager = GridLayoutManager(this, FOUR_COLUMNS)
         rvPhotoList.layoutManager = layoutManager
         val adapter = PhotoAdapter(emptyList<Photo>().toMutableList()) {
                 position: Int, photos: List<Photo>, imageShared: View ->
@@ -62,7 +90,7 @@ class PhotoActivity : BaseActivity() {
         rvPhotoList.itemAnimator = SlideInUpAnimator(AccelerateDecelerateInterpolator())
         rvPhotoList.itemAnimator!!.addDuration = DURATION
         rvPhotoList.adapter = adapter
-        rvPhotoList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
+//        rvPhotoList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
     }
 
     private fun update(state: PhotoState) {
