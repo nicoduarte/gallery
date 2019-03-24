@@ -1,38 +1,35 @@
 package com.nicoduarte.gallery.ui.photo
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.SharedElementCallback
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
+import android.view.ScaleGestureDetector
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.View.OnLayoutChangeListener
+import android.view.animation.*
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
 import com.nicoduarte.gallery.gone
 import com.nicoduarte.gallery.ui.BaseActivity
 import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity
-import com.nicoduarte.gallery.utils.ItemOffsetDecoration
+import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity.Companion.EXIT_POSITION
 import com.nicoduarte.gallery.visible
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.activity_photo.*
-import android.app.Activity
-import android.support.v4.app.SharedElementCallback
-import android.view.Menu
-import android.view.MenuItem
-import com.nicoduarte.gallery.ui.detail.PhotoDetailActivity.Companion.EXIT_POSITION
-import android.view.View.OnLayoutChangeListener
-
 
 class PhotoActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_ID: String = "EXTRA_ID"
         const val DURATION: Long = 500
-        const val TWO_COLUMNS: Int = 2
-        const val FOUR_COLUMNS: Int = 4
     }
 
     private lateinit var viewModel: PhotoViewModel
@@ -47,6 +44,8 @@ class PhotoActivity : BaseActivity() {
         enableHomeDisplay(true)
         setUpRecyclerView()
         setUpViewModel()
+
+        PhotoAdapter.SPAN_COUNT = 3
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -63,14 +62,18 @@ class PhotoActivity : BaseActivity() {
             }
             R.id.grid -> {
                 val gridLayout = rvPhotoList.layoutManager as GridLayoutManager
-                if(gridLayout.spanCount == TWO_COLUMNS) {
-                    gridLayout.spanCount = FOUR_COLUMNS
+                if(PhotoAdapter.SPAN_COUNT == 2) {
+                    PhotoAdapter.SPAN_COUNT = 3
+                    gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
                     item.setIcon(R.drawable.ic_two_columns)
                 } else {
-                    gridLayout.spanCount = TWO_COLUMNS
+                    PhotoAdapter.SPAN_COUNT = 2
+                    gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
                     item.setIcon(R.drawable.ic_four_columns)
                 }
-                rvPhotoList.layoutManager = gridLayout
+
+                val adapter = rvPhotoList.adapter as PhotoAdapter
+                adapter.onItemChange(0, adapter.itemCount -1)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -85,8 +88,9 @@ class PhotoActivity : BaseActivity() {
     }
 
     private fun setUpRecyclerView() {
-        val layoutManager = GridLayoutManager(this, FOUR_COLUMNS)
+        val layoutManager = GridLayoutManager(this, PhotoAdapter.SPAN_COUNT)
         rvPhotoList.layoutManager = layoutManager
+
         val adapter = PhotoAdapter(emptyList<Photo>().toMutableList()) {
                 position: Int, photos: List<Photo>, imageShared: View ->
             launchActivity(position, photos as ArrayList<Photo>, imageShared)
@@ -94,7 +98,46 @@ class PhotoActivity : BaseActivity() {
         rvPhotoList.itemAnimator = SlideInUpAnimator(AccelerateDecelerateInterpolator())
         rvPhotoList.itemAnimator!!.addDuration = DURATION
         rvPhotoList.adapter = adapter
-//        rvPhotoList.addItemDecoration(ItemOffsetDecoration(resources.getDimension(R.dimen.item_offset).toInt()))
+
+        //set scale gesture detector
+        val mScaleGestureDetector =
+            ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    val gridLayout = rvPhotoList.layoutManager as GridLayoutManager
+                    if (detector.currentSpan > 200 && detector.timeDelta > 200) {
+                        if (detector.currentSpan - detector.previousSpan < -1) {
+                            if (gridLayout.spanCount == 1) {
+                                PhotoAdapter.SPAN_COUNT = 2
+                                gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
+                                return true
+                            } else if (gridLayout.spanCount == 2) {
+                                PhotoAdapter.SPAN_COUNT = 3
+                                gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
+                                return true
+                            }
+                        } else if (detector.currentSpan - detector.previousSpan > 1) {
+                            if (gridLayout.spanCount == 3) {
+                                PhotoAdapter.SPAN_COUNT = 2
+                                gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
+                                return true
+                            } else if (gridLayout.spanCount == 2) {
+                                PhotoAdapter.SPAN_COUNT = 1
+                                gridLayout.spanCount = PhotoAdapter.SPAN_COUNT
+                                return true
+                            }
+                        }
+                    }
+                    val adapter = rvPhotoList.adapter as PhotoAdapter
+                    adapter.onItemChange(0, adapter.itemCount -1)
+                    return false
+                }
+            })
+
+        //set touch listener on recycler view
+        rvPhotoList.setOnTouchListener { v, event ->
+            mScaleGestureDetector.onTouchEvent(event)
+            false
+        }
     }
 
     private fun update(state: PhotoState) {
@@ -105,16 +148,8 @@ class PhotoActivity : BaseActivity() {
 
     private fun showPhotoList(state: PhotoState) {
         if (state.photos != null) {
-            if (rvPhotoList.adapter == null) {
-                val adapter = PhotoAdapter(state.photos.toMutableList()) {
-                        position: Int, photos: List<Photo>, imageShared: View ->
-                    launchActivity(position, photos as ArrayList<Photo>, imageShared)
-                }
-                rvPhotoList.adapter = adapter
-            }  else {
-                val adapter = rvPhotoList.adapter as? PhotoAdapter
-                adapter?.addAlbums(state.photos)
-            }
+            val adapter = rvPhotoList.adapter as? PhotoAdapter
+            adapter?.addAlbums(state.photos)
         }
     }
 

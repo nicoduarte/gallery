@@ -3,6 +3,7 @@ package com.nicoduarte.gallery.ui.photo
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.nicoduarte.gallery.GlideApp
 import com.nicoduarte.gallery.R
 import com.nicoduarte.gallery.database.model.Photo
@@ -12,7 +13,7 @@ import kotlinx.android.synthetic.main.item_photo.view.*
 class PhotoAdapter(var items: MutableList<Photo>, private val clickListener: (position: Int, items: List<Photo>, imageShared: View) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        const val SPAN_COUNT: Int = 2
+        var SPAN_COUNT: Int = 3
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerView.ViewHolder {
@@ -31,6 +32,15 @@ class PhotoAdapter(var items: MutableList<Photo>, private val clickListener: (po
             photo: Photo,
             clickListener: (position: Int, items: List<Photo>, imageShared: View) -> Unit
         ) = with(itemView) {
+
+            val displayMetrics = resources.displayMetrics
+            val width = displayMetrics.widthPixels / displayMetrics.density
+            val imageDimension = width / SPAN_COUNT
+
+            val scale = displayMetrics.density
+            val pixels = imageDimension * scale
+
+            ivPhoto.layoutParams = LinearLayout.LayoutParams(pixels.toInt(), pixels.toInt())
             tvTitle.text = photo.title
             GlideApp.with(context)
                 .load(photo.thumbnailUrl)
@@ -39,6 +49,10 @@ class PhotoAdapter(var items: MutableList<Photo>, private val clickListener: (po
             ivPhoto.transitionName = adapterPosition.toString()
             setOnClickListener { clickListener(adapterPosition, items.toList(), ivPhoto) }
         }
+    }
+
+    fun onItemChange(start: Int, end: Int) {
+        notifyItemRangeChanged(start, end)
     }
 
     fun addAlbums(movies: List<Photo>) {

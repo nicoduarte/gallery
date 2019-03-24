@@ -18,8 +18,9 @@
 
         <ImageView
                 android:id="@+id/ivPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/photo_height"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:adjustViewBounds="true"
                 android:src="@drawable/album_placeholder"/>
 
         <TextView
